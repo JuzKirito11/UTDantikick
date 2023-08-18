@@ -1,0 +1,60 @@
+wait(7)
+local HttpService = game:GetService("HttpService")
+local tpservice = game:GetService("TeleportService")
+local plr = game.Players.LocalPlayer
+
+
+local function sendWebhookMessage(text)
+    local response = request({
+        Url = webhookUrl,
+        Method = "POST",
+        Headers = {
+            ["Content-Type"] = "application/json"
+        },
+        Body = HttpService:JSONEncode({
+            ["content"] = "",
+            ["embeds"] = {{
+                ["title"] = "**Game: Ultimate Tower Defense **",
+                ["type"] = "rich",
+                ["color"] = tonumber(0xffffff),
+                ["fields"] = {
+                    {
+                        ["name"] = "**Results: **",
+                        ["value"] = table.concat(text, '\n'),
+                        ["inline"] = true
+                    }
+                }
+            }}
+        })
+    })
+end
+
+repeat
+    wait()
+until game:IsLoaded()
+
+game:GetService("CoreGui").RobloxPromptGui.promptOverlay.ChildAdded:Connect(function(p1)
+    if p1.Name == "ErrorPrompt" then
+        local text = {
+            "Game: Ultimate Tower Defense",
+            "Got kicked - rejoining! (check on it)"
+        }
+        sendWebhookMessage(text)
+        tpservice:Teleport(game.PlaceId, plr)
+    end
+end)
+
+wait(540)  ---time in server until it automatically rejoins (adjust as needed)
+
+sendWebhookMessage({
+    "Game: Ultimate Tower Defense",
+    "Got kicked - rejoining! (check on it)"
+})
+tpservice:Teleport(game.PlaceId, plr)
+
+wait(5)
+sendWebhookMessage({
+    "Game: Ultimate Tower Defense",
+    "Got kicked - rejoining! (check on it)"
+})
+tpservice:Teleport(game.PlaceId, plr)
